@@ -1,38 +1,41 @@
 const themes = [
-  () => { background(0); fill(255); stroke(0); },
-  () => { background(0); noFill(); stroke(255); },
-  () => { background(255); noFill(); stroke(0); },
-  () => { background(255); fill(0); stroke(255); },
+  () => { background(0); document.documentElement.style.background = "rgb(0,0,0)"; fill(255); stroke(0); },
+  () => { background(0); document.documentElement.style.background = "rgb(0,0,0)"; noFill(); stroke(255); },
+  () => { background(255); document.documentElement.style.background = "rgb(255,255,255)"; noFill(); stroke(0); },
+  () => { background(255); document.documentElement.style.background = "rgb(255,255,255)"; fill(0); stroke(255); },
 ]
 let currentTheme = 0;
-let lastClick = null;
+let currentOrientation = undefined;
 let xOffset = 0;
 let yOffset = 0;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  
-  background(0);
-  fill(255);
-  stroke(0);
+  createCanvas(window.screen.width, window.screen.height, WEBGL);
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
-function mouseClicked() {
-  const currentClick = Date.now();
-  if (lastClick && (currentClick - lastClick) < 500) {
+document.addEventListener('DOMContentLoaded', () => {
+  const hammertime = new Hammer(document.body);
+  hammertime.get('doubletap').set({ interval: 2000 });
+  hammertime.on('doubletap swipe', () => {
     currentTheme = (currentTheme + 1) % themes.length;
-    lastClick = null;
-  }
+  })
+});
 
-  lastClick = currentClick;
-}
 
-function applyTheme() {
+function reconcileTheme() {
   themes[currentTheme]();
+}                                                      
+
+function reconcileDimensions() {
+  if (window.orientation === undefined) return;
+  if (window.orientation === currentOrientation) return;
+
+  currentOrientation = window.orientation;
+  if (currentOrientation / 90 % 2 !== 0) {
+    resizeCanvas(window.screen.height, window.screen.width);
+  } else {
+    resizeCanvas(window.screen.width, window.screen.height);
+  }
 }
 
 function z(x, y) {
@@ -42,13 +45,14 @@ function z(x, y) {
 }
 
 function draw() {
-  applyTheme();
+  reconcileTheme();
+  reconcileDimensions();
 
-  const meshDesiredWidth = Math.round(width / 2);
+  const meshDesiredWidth =  Math.round(width / 2);
   const meshDesiredHeight = Math.round(height / 2);
 
-  const rows = Math.round(50);
-  const columns = Math.round((width / height) * rows);
+  const rows = Math.min(50, Math.round(meshDesiredHeight / 10));
+  const columns = Math.min(80, Math.round((meshDesiredWidth / meshDesiredHeight) * rows));
 
   const scale = Math.min(meshDesiredWidth / columns, meshDesiredHeight / rows);
 
