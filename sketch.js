@@ -5,6 +5,7 @@ const themes = [
   () => { background(255); fill(0); stroke(255); },
 ]
 let currentTheme = 0;
+let lastClick = null;
 let xOffset = 0;
 let yOffset = 0;
 
@@ -20,8 +21,14 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-function doubleClicked() {
-  currentTheme = (currentTheme + 1) % themes.length;
+function mouseClicked() {
+  const currentClick = Date.now();
+  if (lastClick && (currentClick - lastClick) < 500) {
+    currentTheme = (currentTheme + 1) % themes.length;
+    lastClick = null;
+  }
+
+  lastClick = currentClick;
 }
 
 function applyTheme() {
