@@ -1,0 +1,16 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body { 
+    margin: 0px;
+    padding: 0px;
+}
+canvas {
+    display: block;
+}
+canvas:focus {
+    outline: 0;
+}
