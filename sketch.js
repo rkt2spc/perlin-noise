@@ -5,12 +5,11 @@ const themes = [
   () => { background(255); document.documentElement.style.background = "rgb(255,255,255)"; fill(0); stroke(255); },
 ]
 let currentTheme = 0;
-let currentOrientation = undefined;
 let xOffset = 0;
 let yOffset = 0;
 
 function setup() {
-  createCanvas(window.screen.width, window.screen.height, WEBGL);
+  createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,15 +26,8 @@ function reconcileTheme() {
 }                                                      
 
 function reconcileDimensions() {
-  if (window.orientation === undefined) return;
-  if (window.orientation === currentOrientation) return;
-
-  currentOrientation = window.orientation;
-  if (currentOrientation / 90 % 2 !== 0) {
-    resizeCanvas(window.screen.height, window.screen.width);
-  } else {
-    resizeCanvas(window.screen.width, window.screen.height);
-  }
+  if (width === window.innerWidth && height === window.innerHeight) return;
+  resizeCanvas(window.innerWidth, window.innerHeight);
 }
 
 function z(x, y) {
@@ -59,8 +51,8 @@ function draw() {
   const meshWidth = columns * scale;
   const meshHeight = rows * scale;
 
-  translate(-meshWidth / 2, -meshHeight / 2);
-  rotateX(radians(40));
+  translate(-meshWidth / 2 + scale, -meshHeight / 2 + scale);
+  rotateX(radians(30));
   
   xOffset += (mouseX < (width / 2) ? 1 : -1) * 0.25;
   yOffset += (mouseY < (height / 2) ? 1 : -1) * 0.25;
